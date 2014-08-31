@@ -24,7 +24,7 @@ results = {
 		type:'folder', //could be folder/file,
 		name:'troll.doc', //filename
 		path:'C://Users', //location of file
-		date_modified:'130492991778279313' //date of modification of file
+		date_modified:'130492991778279313' //date of modification of file in EPOCH time
 	}
 }
 ```
