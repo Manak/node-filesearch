@@ -69,6 +69,7 @@ if(os.platform().indexOf('darwin')==-1){
 				var resultsObj = {};
 				resultsObj.totalResults = results.length;
 				resultsObj.results = [];
+				resultsObj.query = query;
 				for(var i in results){
 					if(i == $this.MAX_RESULTS){
 						break;
