@@ -1,3 +1,5 @@
 var x = require('./nfs.js');
-x.search('.doc',function(results){console.log(results);});
+x.search('LA - SIN',function(results){
+	console.log(results);
+});
 
