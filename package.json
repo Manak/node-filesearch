@@ -6,6 +6,7 @@
   "author": "Manak Kapoor <manak.kapoor@gmail.com>",
   "license": "NONE",
   "dependencies": {
-        "request": "*"
+        "request": "*",
+        "execsync-ng":"*"
    }
 }
