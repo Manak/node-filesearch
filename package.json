@@ -7,6 +7,7 @@
   "license": "NONE",
   "dependencies": {
         "request": "*",
-        "execsync-ng":"*"
+        "execsync-ng":"*",
+        "exec-sync":"*"
    }
 }

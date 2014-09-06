@@ -1,4 +1,5 @@
 var os = require('os');
+
 if(os.platform().indexOf('darwin')==-1){
 	/*IF PLATFORM == WINDOWS*/
 	var request = require('request');
@@ -65,6 +66,7 @@ if(os.platform().indexOf('darwin')==-1){
 	var exec = require('child_process').exec;
 	var path = require('path');
 	var fs = require('fs');
+	var syncExec = require('execsync-ng');
 
 	var executable;
 	module.exports = {
@@ -81,7 +83,7 @@ if(os.platform().indexOf('darwin')==-1){
 			exec('mdfind -name '+query, function(error, stdout, stderr){
 				var results = stdout.split('\n');
 				var resultsObj = {};
-				resultsObj.totalResults = results.length;
+				resultsObj.totalResults = results.length-1;
 				resultsObj.results = [];
 				resultsObj.query = query;
 				for(var i in results){
@@ -98,6 +100,17 @@ if(os.platform().indexOf('darwin')==-1){
 					} else {
 						result.type = 'file';
 					}
+					var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"');
+					
+					if(icon.stdout.indexOf('nofile')==-1)
+						result.icon = 'data:image/Png;base64,'+icon.stdout.split(' ')[3].replace('\n','');
+					else
+						result.icon = undefined;
+					/*if(icon.stdout.indexOf('folder') == -1 && icon.stdout.indexOf('noargs') == -1 && icon.stdout.indexOf('notfound') == -1){
+						results.results[i].icon = icon.stdout.replace('\n','');
+					} else {
+						results.results[i].icon = undefined;
+					}*/
 					resultsObj.results.push(result);
 				}
 				callback(resultsObj);
