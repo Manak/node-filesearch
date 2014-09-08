@@ -8,6 +8,7 @@
   "dependencies": {
         "request": "*",
         "execsync-ng":"*",
-        "exec-sync":"*"
+        "exec-sync":"*",
+        "async":"*"
    }
 }

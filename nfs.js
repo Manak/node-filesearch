@@ -62,11 +62,12 @@ if(os.platform().indexOf('darwin')==-1){
 
 } else {
 
-/*IF PLATFORM IS MAC*/
+	/*IF PLATFORM IS MAC*/
 	var exec = require('child_process').exec;
 	var path = require('path');
 	var fs = require('fs');
 	var syncExec = require('execsync-ng');
+	var async = require('async');
 
 	var executable;
 	module.exports = {
@@ -100,24 +101,42 @@ if(os.platform().indexOf('darwin')==-1){
 					} else {
 						result.type = 'file';
 					}
-					var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"');
+					// var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"');
 					
-					if(icon.stdout.indexOf('nofile')==-1)
-						result.icon = 'data:image/Png;base64,'+icon.stdout.split(' ')[3].replace('\n','');
-					else
-						result.icon = undefined;
-					/*if(icon.stdout.indexOf('folder') == -1 && icon.stdout.indexOf('noargs') == -1 && icon.stdout.indexOf('notfound') == -1){
-						results.results[i].icon = icon.stdout.replace('\n','');
-					} else {
-						results.results[i].icon = undefined;
-					}*/
+					// if(icon.stdout.indexOf('nofile')==-1)
+					// 	result.icon = 'data:image/Png;base64,'+icon.stdout.split(' ')[3].replace('\n','');
+					// else
+					// 	result.icon = undefined;
+
 					resultsObj.results.push(result);
 				}
-				callback(resultsObj);
+				var asyncIconArr =[];
+				for(var i in resultsObj.results){
+					var result = resultsObj.results[i];
+					asyncIconArr.push(function(cb){
+						exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"',[],function(err, stderr,stdout){
+							cb(stderr,stdout);
+						});
+					})
+				}
+				async.parallelLimit(asyncIconArr, 6, function(err,results){
+					console.log(results);
+					for(var i in results){
+						var icon = results[i];
+						if(icon.indexOf("nofile") !== -1){
+							resultsObj.results[i].icon = undefined;
+						} else if(icon.split(' ')[3] !== undefined){
+							resultsObj.results[i].icon = 'data:image/Png;base64,'+icon.split(' ')[3].replace('\n','');
+						} else {
+							resultsObj.results[i].icon = undefined;
+						}
+					}
+					callback(resultsObj);
+				});
 			});
-		}
+}
 
-	};
+};
 
 
 
