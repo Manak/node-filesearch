@@ -22,6 +22,7 @@ results = {
 		type:'folder', //could be folder/file,
 		name:'troll.doc', //filename
 		path:'C://Users', //location of file
+		icon:'base64 encoded png/bmp'
 	},
 	query:'troll' //your query to the search engine
 }
