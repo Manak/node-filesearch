@@ -5,7 +5,7 @@ if(os.platform().indexOf('darwin')==-1){
 	var request = require('request');
 	var spawn = require('child_process').spawn;
 	var exec = require('child_process').exec;
-	var syncExec = require('execsync-ng');
+	var async = require('async');
 
 	var EverythingExecutable;	
 	var isReady = false;
@@ -27,20 +27,32 @@ if(os.platform().indexOf('darwin')==-1){
 			request('http://127.0.0.3:1024/?search='+encodeURIComponent(query)+'&json=1&path_column=1&count=10', function(error,response, body){
 				var results = JSON.parse(body);
 				results.query = query;
+				var asyncIconArr = [];
 				for(var i in results.results){
 					curResult = results.results[i];
-					if(curResult.type =='folder'){
-						results.results[i].icon = undefined;
-						continue;
-					}
-					var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"');
-					if(icon.stdout.indexOf('folder') == -1 && icon.stdout.indexOf('noargs') == -1 && icon.stdout.indexOf('notfound') == -1){
-						results.results[i].icon = icon.stdout.replace('\n','');
-					} else {
-						results.results[i].icon = undefined;
-					}
+					asyncIconArr.push(function(cb){
+						exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"',[],function(err, stdout,stderr){
+							cb(stderr,stdout);
+						});
+					})
+					// var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"');
+					// if(icon.stdout.indexOf('folder') == -1 && icon.stdout.indexOf('noargs') == -1 && icon.stdout.indexOf('notfound') == -1){
+					// 	results.results[i].icon = icon.stdout.replace('\n','');
+					// } else {
+					// 	results.results[i].icon = undefined;
+					// }
 				}
-				callback(results);
+				async.parallelLimit(asyncIconArr, 6, function(err,xresults){
+					for(var i in xresults){
+						var icon = xresults[i];
+						if(icon.indexOf("notfound") !== -1 || icon.indexOf("noargs") !== -1 || icon.indexOf('folder')!==-1){
+							results.results[i].icon = undefined;
+						} else {
+							results.results[i].icon =icon.replace(['\r\n'],'');
+						}
+					}
+					callback(results);
+				});
 			});
 		}
 
@@ -120,7 +132,6 @@ if(os.platform().indexOf('darwin')==-1){
 					})
 				}
 				async.parallelLimit(asyncIconArr, 6, function(err,results){
-					console.log(results);
 					for(var i in results){
 						var icon = results[i];
 						if(icon.indexOf("nofile") !== -1){

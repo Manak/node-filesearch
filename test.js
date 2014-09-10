@@ -1,5 +1,5 @@
 var x = require('./nfs.js');
-x.search('node-webkit',function(results){
+x.search('nfs.js',function(results){
 	console.log(results);
 });
 
