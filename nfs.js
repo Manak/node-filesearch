@@ -11,7 +11,7 @@ if(os.platform().indexOf('darwin')==-1){
 	var isReady = false;
 
 	module.exports = {
-		PATH : './exec/',
+		PATH : __dirname + '/exec/',
 		MAX_RESULTS : 20,
 		setPath : function(path){
 			this.PATH = path;
@@ -78,12 +78,11 @@ if(os.platform().indexOf('darwin')==-1){
 	var exec = require('child_process').exec;
 	var path = require('path');
 	var fs = require('fs');
-	var syncExec = require('execsync-ng');
 	var async = require('async');
 
 	var executable;
 	module.exports = {
-		PATH : './exec/',
+		PATH : __dirname + '/exec/',
 		MAX_RESULTS : 20,
 		setPath : function(path){
 			return true;
