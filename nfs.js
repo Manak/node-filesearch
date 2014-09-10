@@ -92,7 +92,7 @@ if(os.platform().indexOf('darwin')==-1){
 		},
 		search : function(query,callback){
 			var $this = this;
-			exec('mdfind -name '+query, function(error, stdout, stderr){
+			exec('mdfind -name "'+query+'"', function(error, stdout, stderr){
 				var results = stdout.split('\n');
 				var resultsObj = {};
 				resultsObj.totalResults = results.length-1;

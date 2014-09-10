@@ -1,6 +1,6 @@
 {
   "name": "node-filesearch",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Search filesystem on MAC and Windows through node",
   "main": "nfs.js",
   "author": "Manak Kapoor <manak.kapoor@gmail.com>",
