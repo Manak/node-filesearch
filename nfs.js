@@ -23,6 +23,11 @@ if(os.platform().indexOf('darwin')==-1){
 			else
 				return false;
 		},
+		getIcon: function(path,cb){
+			exec('"'+module.exports.PATH+'IconExtractor.exe" "'+path+'"',[],function(err, stdout,stderr){
+				cb(stdout);
+			});
+		},
 		search : function(query,callback){
 			request('http://127.0.0.3:1024/?search='+encodeURIComponent(query)+'&json=1&path_column=1&count=10', function(error,response, body){
 				var results = JSON.parse(body);
@@ -54,21 +59,21 @@ if(os.platform().indexOf('darwin')==-1){
 					callback(results);
 				});
 			});
-		}
+}
 
-	};
+};
 
-	var init = function(){
-		EverythingExecutable = exec(module.exports.PATH+'everything.exe -admin -startup -config "'+ module.exports.PATH+'Everything.ini" -minimized',[]);
+var init = function(){
+	EverythingExecutable = exec(module.exports.PATH+'everything.exe -admin -startup -config "'+ module.exports.PATH+'Everything.ini" -minimized',[]);
 
-		EverythingExecutable.on('close',function(){
-			isReady = false;
-		});
+	EverythingExecutable.on('close',function(){
+		isReady = false;
+	});
 
-		isReady = true;
-	}
+	isReady = true;
+}
 
-	init();
+init();
 
 
 
@@ -89,6 +94,19 @@ if(os.platform().indexOf('darwin')==-1){
 		},
 		getPath : function(){
 			return true;
+		},
+		getIcon: function(path,cb){
+			exec('"'+module.exports.PATH+'IconExtractor" "'+path+'"',[],function(err, stderr,stdout){
+				var icon = stdout;
+				if(icon.indexOf("nofile") !== -1){
+					icon = undefined;
+				} else if(icon.split(' ')[3] !== undefined){
+					icon = 'data:image/Png;base64,'+icon.split(' ')[3].replace('\n','');
+				} else {
+					icon = undefined;
+				}
+				cb(icon);
+			});
 		},
 		search : function(query,callback){
 			var $this = this;
