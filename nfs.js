@@ -59,7 +59,7 @@ if(os.platform().indexOf('darwin')==-1){
 	};
 
 	var init = function(){
-		EverythingExecutable = exec(module.exports.PATH+'everything.exe', ['-startup','-config Everything.ini']);
+		EverythingExecutable = exec(module.exports.PATH+'everything.exe', ['-startup','-config "'+module.exports.PATH+'Everything.ini"']);
 
 		EverythingExecutable.on('close',function(){
 			isReady = false;
