@@ -34,12 +34,13 @@ if(os.platform().indexOf('darwin')==-1){
 				results.query = query;
 				var asyncIconArr = [];
 				for(var i in results.results){
-					curResult = results.results[i];
-					asyncIconArr.push(function(cb){
-						exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"',[],function(err, stdout,stderr){
-							cb(stderr,stdout);
-						});
-					})
+					(function(curResult){
+						asyncIconArr.push(function(cb){
+							exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"',[],function(err, stdout,stderr){
+								cb(stderr,stdout);
+							});
+						})
+					})(results.results[i]);
 					// var icon = syncExec.exec('"'+module.exports.PATH+'IconExtractor.exe" "'+curResult.path+'\\'+curResult.name+'"');
 					// if(icon.stdout.indexOf('folder') == -1 && icon.stdout.indexOf('noargs') == -1 && icon.stdout.indexOf('notfound') == -1){
 					// 	results.results[i].icon = icon.stdout.replace('\n','');
@@ -96,6 +97,7 @@ init();
 			return true;
 		},
 		getIcon: function(path,cb){
+			
 			exec('"'+module.exports.PATH+'IconExtractor" "'+path+'"',[],function(err, stderr,stdout){
 				var icon = stdout;
 				if(icon.indexOf("nofile") !== -1){
@@ -141,14 +143,17 @@ init();
 				}
 				var asyncIconArr =[];
 				for(var i in resultsObj.results){
-					var result = resultsObj.results[i];
-					asyncIconArr.push(function(cb){
-						exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"',[],function(err, stderr,stdout){
-							cb(stderr,stdout);
+					(function(result){
+						asyncIconArr.push(function(cb){
+							console.log(result.name);
+							exec('"'+module.exports.PATH+'IconExtractor" "'+result.path+'/'+result.name+'"',[],function(err, stderr,stdout){
+								cb(stderr,stdout);
+							});
 						});
-					})
+					})(resultsObj.results[i]);
 				}
 				async.parallelLimit(asyncIconArr, 6, function(err,results){
+					console.log(results);
 					for(var i in results){
 						var icon = results[i];
 						if(icon.indexOf("nofile") !== -1){
@@ -170,4 +175,5 @@ init();
 
 
 }
+
 
